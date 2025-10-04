@@ -14,7 +14,7 @@ use bevy_inspector_egui::{
 use ron::ser::PrettyConfig;
 use serde::{Deserialize, Serialize};
 use worley_biomes::{
-    biome_picker::{Biome, SimpleBiomePicker},
+    biome_picker::{BiomeVariants, SimpleBiomePicker},
     distance_fn::DistanceFn,
     warp::{FractalType, NoiseType, WarpSettings},
     worley::Worley,
@@ -29,7 +29,7 @@ enum BiomeType {
     Plains,
 }
 
-impl Biome for BiomeType {
+impl BiomeVariants for BiomeType {
     fn variants() -> &'static [Self] {
         &[Self::Desert, Self::Forest, Self::Snow, Self::Plains]
     }
@@ -546,7 +546,7 @@ fn setup(mut commands: Commands) {
     let mut worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>> = Worley {
         zoom: 62.0,
         distance_fn: DistanceFn::Chebyshev,
-        biome_picker: SimpleBiomePicker::UniformDistribution,
+        biome_picker: SimpleBiomePicker::Any,
         _phantom: PhantomData::default(),
         sharpness: 20.0,
         k: 3,

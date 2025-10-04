@@ -8,24 +8,30 @@ pub trait BiomePicker<BiomeT> {
 }
 
 ///! trait needed to know what variants are available
-pub trait Biome: Copy {
+pub trait BiomeVariants: Copy {
     fn variants() -> &'static [Self]; // list of all variants
 }
 
 ///! used to generates a biome VARIANT, based upon a "cell" position
 #[derive(Serialize, Deserialize)]
-pub enum SimpleBiomePicker<BiomeT: Biome> {
+pub enum SimpleBiomePicker<BiomeT: BiomeVariants> {
     // all variants have same chance of being selected
-    UniformDistribution,
+    Any,
+    // all variants have same chance of being selected
+    AnyOf(Vec<BiomeT>),
     // weighted odds for biomes to be selected
     Weighted(Vec<(BiomeT, f32)>),
 }
 
-impl<BiomeT: Biome + 'static> BiomePicker<BiomeT> for SimpleBiomePicker<BiomeT> {
+impl<BiomeT: BiomeVariants + 'static> BiomePicker<BiomeT> for SimpleBiomePicker<BiomeT> {
     fn pick_biome(&self, seed: u64, cell_x: i32, cell_z: i32) -> BiomeT {
         match self {
-            SimpleBiomePicker::UniformDistribution => {
+            SimpleBiomePicker::Any => {
                 let variants = BiomeT::variants();
+                let idx = (hash_u64(seed, cell_x, cell_z) % variants.len() as u64) as usize;
+                variants[idx]
+            }
+            SimpleBiomePicker::AnyOf(variants) => {
                 let idx = (hash_u64(seed, cell_x, cell_z) % variants.len() as u64) as usize;
                 variants[idx]
             }

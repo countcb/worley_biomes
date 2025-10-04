@@ -3,7 +3,7 @@ use std::marker::PhantomData;
 use bracket_noise::prelude::FastNoise;
 use serde::{Deserialize, Serialize};
 
-use crate::biome_picker::{Biome, BiomePicker, SimpleBiomePicker};
+use crate::biome_picker::{BiomePicker, BiomeVariants, SimpleBiomePicker};
 use crate::distance_fn::{DistanceFn, distance};
 use crate::utils::hash_u64;
 use crate::warp::{WarpSettings, warp_coords};
@@ -12,7 +12,7 @@ use crate::warp::{WarpSettings, warp_coords};
 #[derive(Serialize, Deserialize)]
 pub struct Worley<BiomeT, Picker>
 where
-    BiomeT: Biome + Serialize,
+    BiomeT: BiomeVariants + Serialize,
     Picker: BiomePicker<BiomeT> + Serialize,
 {
     ///! biome picking
@@ -38,7 +38,7 @@ fn default_fast_noise() -> FastNoise {
 
 impl<BiomeT, Picker> Worley<BiomeT, Picker>
 where
-    BiomeT: Biome + 'static + Serialize,
+    BiomeT: BiomeVariants + 'static + Serialize,
     Picker: BiomePicker<BiomeT> + Serialize,
 {
     pub fn rebuild_cached_noise(&mut self) {
