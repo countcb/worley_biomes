@@ -3,19 +3,20 @@ use std::marker::PhantomData;
 use bracket_noise::prelude::FastNoise;
 use serde::{Deserialize, Serialize};
 
-use crate::biome_picker::{Biome, BiomeGenerator};
+use crate::biome_picker::{Biome, BiomePicker, SimpleBiomePicker};
 use crate::distance_fn::{DistanceFn, distance};
 use crate::utils::hash_u64;
 use crate::warp::{WarpSettings, warp_coords};
 
 ///! a biome picker based on (worley) which is offset by (noise)
 #[derive(Serialize, Deserialize)]
-pub struct Worley<BiomeT>
+pub struct Worley<BiomeT, Picker>
 where
     BiomeT: Biome + Serialize,
+    Picker: BiomePicker<BiomeT> + Serialize,
 {
     ///! biome picking
-    pub biome_generator: BiomeGenerator<BiomeT>,
+    pub biome_picker: Picker,
     pub zoom: f64,
     ///!
     pub distance_fn: DistanceFn,
@@ -35,9 +36,10 @@ fn default_fast_noise() -> FastNoise {
     FastNoise::new()
 }
 
-impl<BiomeT> Worley<BiomeT>
+impl<BiomeT, Picker> Worley<BiomeT, Picker>
 where
     BiomeT: Biome + 'static + Serialize,
+    Picker: BiomePicker<BiomeT> + Serialize,
 {
     pub fn rebuild_cached_noise(&mut self) {
         self.cached_warp_noise = self.warp_settings.make_fast_noise();
@@ -66,7 +68,7 @@ where
                 let cz = cell_z + dz;
                 let (fx, fz) = cell_point(seed, cx, cz);
                 let dist = distance(x - fx, z - fz, self.distance_fn);
-                let biome = self.biome_generator.pick_biome(seed, cx, cz);
+                let biome = self.biome_picker.pick_biome(seed, cx, cz);
                 candidates.push((dist, biome));
             }
         }

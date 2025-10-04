@@ -14,7 +14,7 @@ use bevy_inspector_egui::{
 use ron::ser::PrettyConfig;
 use serde::{Deserialize, Serialize};
 use worley_biomes::{
-    biome_picker::{Biome, BiomeGenerator},
+    biome_picker::{Biome, SimpleBiomePicker},
     distance_fn::DistanceFn,
     warp::{FractalType, NoiseType, WarpSettings},
     worley::Worley,
@@ -103,7 +103,7 @@ fn main() {
 ///! the worley generator
 #[derive(Resource)]
 struct MapSettings {
-    worley: Worley<BiomeType>,
+    worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>>,
 }
 
 ///! avoid duplication of same color voxel material
@@ -322,7 +322,8 @@ fn inspector_ui(world: &mut World) {
                 let file = std::fs::read_to_string(&path);
                 match file {
                     Ok(f) => {
-                        let result = ron::from_str::<Worley<BiomeType>>(&f);
+                        let result =
+                            ron::from_str::<Worley<BiomeType, SimpleBiomePicker<BiomeType>>>(&f);
                         match result {
                             Ok(new_worley) => {
                                 // REPLACE
@@ -359,7 +360,7 @@ fn inspector_ui(world: &mut World) {
                 .changed();
 
             egui::CollapsingHeader::new("distance fn").show(ui, |ui| {
-                let mut s = |worley: &mut Worley<BiomeType>,
+                let mut s = |worley: &mut Worley<BiomeType, SimpleBiomePicker<BiomeType>>,
                              any_changed: &mut bool,
                              target_metric: DistanceFn| {
                     if ui
@@ -448,19 +449,21 @@ fn inspector_ui(world: &mut World) {
 
                 ui.label("warp noise");
                 egui::CollapsingHeader::new("noise type").show(ui, |ui| {
-                    let mut noise = |worley: &mut Worley<BiomeType>, noise_type: NoiseType| {
-                        if ui
-                            .add(egui::widgets::Button::selectable(
-                                worley.warp_settings.noise_noise_type == noise_type,
-                                format!("{:?}", noise_type),
-                            ))
-                            .clicked()
-                        {
-                            worley.warp_settings.noise_noise_type = noise_type;
-                            worley.rebuild_cached_noise();
-                            any_changed = true;
-                        }
-                    };
+                    let mut noise =
+                        |worley: &mut Worley<BiomeType, SimpleBiomePicker<BiomeType>>,
+                         noise_type: NoiseType| {
+                            if ui
+                                .add(egui::widgets::Button::selectable(
+                                    worley.warp_settings.noise_noise_type == noise_type,
+                                    format!("{:?}", noise_type),
+                                ))
+                                .clicked()
+                            {
+                                worley.warp_settings.noise_noise_type = noise_type;
+                                worley.rebuild_cached_noise();
+                                any_changed = true;
+                            }
+                        };
                     noise(&mut ms.worley, NoiseType::Value);
                     noise(&mut ms.worley, NoiseType::ValueFractal);
                     noise(&mut ms.worley, NoiseType::Perlin);
@@ -473,19 +476,21 @@ fn inspector_ui(world: &mut World) {
                     noise(&mut ms.worley, NoiseType::CubicFractal);
                 });
                 egui::CollapsingHeader::new("fractal type").show(ui, |ui| {
-                    let mut frac = |worley: &mut Worley<BiomeType>, fractal_type: FractalType| {
-                        if ui
-                            .add(egui::widgets::Button::selectable(
-                                worley.warp_settings.noise_fractal_type == fractal_type,
-                                format!("{:?}", fractal_type),
-                            ))
-                            .clicked()
-                        {
-                            worley.warp_settings.noise_fractal_type = fractal_type;
-                            worley.rebuild_cached_noise();
-                            any_changed = true;
-                        }
-                    };
+                    let mut frac =
+                        |worley: &mut Worley<BiomeType, SimpleBiomePicker<BiomeType>>,
+                         fractal_type: FractalType| {
+                            if ui
+                                .add(egui::widgets::Button::selectable(
+                                    worley.warp_settings.noise_fractal_type == fractal_type,
+                                    format!("{:?}", fractal_type),
+                                ))
+                                .clicked()
+                            {
+                                worley.warp_settings.noise_fractal_type = fractal_type;
+                                worley.rebuild_cached_noise();
+                                any_changed = true;
+                            }
+                        };
                     frac(&mut ms.worley, FractalType::FBM);
                     frac(&mut ms.worley, FractalType::Billow);
                     frac(&mut ms.worley, FractalType::RigidMulti);
@@ -538,10 +543,10 @@ fn move_input(
 }
 
 fn setup(mut commands: Commands) {
-    let mut worley: Worley<BiomeType> = Worley {
+    let mut worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>> = Worley {
         zoom: 62.0,
         distance_fn: DistanceFn::Chebyshev,
-        biome_generator: BiomeGenerator::UniformDistribution,
+        biome_picker: SimpleBiomePicker::UniformDistribution,
         _phantom: PhantomData::default(),
         sharpness: 20.0,
         k: 3,
