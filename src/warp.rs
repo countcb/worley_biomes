@@ -1,4 +1,4 @@
-use bracket_noise::prelude::FastNoise;
+use bracket_fast_noise::prelude::FastNoise;
 use serde::{Deserialize, Serialize};
 
 ///! local definition we can serialize, to map to fastnoise
@@ -18,8 +18,8 @@ pub enum NoiseType {
 }
 
 impl NoiseType {
-    pub fn to_fast_noise(self) -> bracket_noise::prelude::NoiseType {
-        use bracket_noise::prelude as bn;
+    pub fn to_fast_noise(self) -> bracket_fast_noise::prelude::NoiseType {
+        use bracket_fast_noise::prelude as bn;
         match self {
             NoiseType::Value => bn::NoiseType::Value,
             NoiseType::ValueFractal => bn::NoiseType::ValueFractal,
@@ -52,8 +52,8 @@ pub enum FractalType {
 }
 
 impl FractalType {
-    fn to_fast_noise(&self) -> bracket_noise::prelude::FractalType {
-        use bracket_noise::prelude::FractalType as ft;
+    fn to_fast_noise(&self) -> bracket_fast_noise::prelude::FractalType {
+        use bracket_fast_noise::prelude::FractalType as ft;
         match self {
             FractalType::FBM => ft::FBM,
             FractalType::Billow => ft::Billow,

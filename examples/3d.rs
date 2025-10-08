@@ -560,7 +560,7 @@ fn setup(mut commands: Commands) {
             noise_noise_type: NoiseType::PerlinFractal,
             noise_fractal_type: FractalType::FBM,
         },
-        cached_warp_noise: bracket_noise::prelude::FastNoise::new(),
+        cached_warp_noise: bracket_fast_noise::prelude::FastNoise::new(),
     };
     worley.rebuild_cached_noise();
     commands.insert_resource(MapSettings { worley });

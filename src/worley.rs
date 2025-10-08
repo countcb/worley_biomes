@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use bracket_noise::prelude::FastNoise;
+use bracket_fast_noise::prelude::FastNoise;
 use serde::{Deserialize, Serialize};
 
 use crate::biome_picker::{BiomePicker, BiomeVariants, SimpleBiomePicker};

@@ -8,7 +8,7 @@ use bevy::{
 };
 use serde::{Deserialize, Serialize};
 use worley_biomes::{
-    biome_picker::{Biome, BiomeGenerator},
+    biome_picker::{BiomeVariants, SimpleBiomePicker},
     distance_fn::DistanceFn,
     warp::{FractalType, NoiseType, WarpSettings},
     worley::Worley,
@@ -22,7 +22,7 @@ enum BiomeType {
     Plains,
 }
 
-impl Biome for BiomeType {
+impl BiomeVariants for BiomeType {
     fn variants() -> &'static [Self] {
         &[Self::Desert, Self::Forest, Self::Snow, Self::Plains]
     }
@@ -51,10 +51,10 @@ pub const GRID_SIZE: i32 = 32 * 4;
 pub const WORLD_SEED: u64 = 12345;
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
-    let mut worley: Worley<BiomeType> = Worley {
+    let mut worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>> = Worley {
         zoom: 17.0,
         distance_fn: DistanceFn::Chebyshev,
-        biome_generator: BiomeGenerator::UniformDistribution,
+        biome_picker: SimpleBiomePicker::Any,
         _phantom: PhantomData::default(),
         sharpness: 20.0,
         k: 3,
@@ -68,7 +68,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
             noise_noise_type: NoiseType::PerlinFractal,
             noise_fractal_type: FractalType::FBM,
         },
-        cached_warp_noise: bracket_noise::prelude::FastNoise::new(),
+        cached_warp_noise: bracket_fast_noise::prelude::FastNoise::new(),
     };
     // the warp noise data must be set up from worley settings
     worley.rebuild_cached_noise();
