@@ -6,11 +6,12 @@ use bevy::{
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension},
 };
+use bracket_fast_noise::prelude::*;
 use serde::{Deserialize, Serialize};
 use worley_biomes::{
     biome_picker::{BiomeVariants, SimpleBiomePicker},
     distance_fn::DistanceFn,
-    warp::{FractalType, NoiseType, WarpSettings},
+    warp::WarpSettings,
     worley::Worley,
 };
 
@@ -51,8 +52,16 @@ pub const GRID_SIZE: i32 = 32 * 4;
 pub const WORLD_SEED: u64 = 12345;
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
+    let mut warp_noise = FastNoise::new();
+    warp_noise.set_seed(0);
+    warp_noise.frequency = 0.7;
+    warp_noise.fractal_lacunarity = 2.0;
+    warp_noise.set_fractal_gain(0.6);
+    warp_noise.fractal_octaves = 3;
+    warp_noise.noise_type = NoiseType::PerlinFractal;
+    warp_noise.fractal_type = FractalType::FBM;
     let mut worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>> = Worley {
-        zoom: 17.0,
+        zoom: 62.0,
         distance_fn: DistanceFn::Chebyshev,
         biome_picker: SimpleBiomePicker::Any,
         _phantom: PhantomData::default(),
@@ -60,18 +69,10 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         k: 3,
         warp_settings: WarpSettings {
             strength: 0.6,
-            noise_seed: 0,
-            noise_frequency: 0.7,
-            noise_fractal_lacunarity: 2.0,
-            noise_fractal_gain: 0.6,
-            noise_fractal_octaves: 5,
-            noise_noise_type: NoiseType::PerlinFractal,
-            noise_fractal_type: FractalType::FBM,
+            noise: warp_noise,
         },
         cached_warp_noise: bracket_fast_noise::prelude::FastNoise::new(),
     };
-    // the warp noise data must be set up from worley settings
-    worley.rebuild_cached_noise();
 
     let mut img_data = Vec::new();
     for gx in 0..GRID_SIZE {
