@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use bevy::{
     asset::RenderAssetUsages,
     image::ImageSampler,
@@ -11,7 +9,6 @@ use serde::{Deserialize, Serialize};
 use worley_biomes::{
     biome_picker::{BiomeVariants, SimpleBiomePicker},
     distance_fn::DistanceFn,
-    warp::WarpSettings,
     worley::Worley,
 };
 
@@ -50,11 +47,10 @@ fn main() {
 
 pub const GRID_SIZE: i32 = 32 * 4;
 
-pub const WORLD_SEED: u64 = 12345;
-
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     let mut worley: Worley<BiomeType, SimpleBiomePicker<BiomeType>> = Worley::default();
-    worley.zoom = 62.0;
+    worley.zoom = 22.0;
+    worley.seed = 12345;
     worley.set_distance_fn(DistanceFn::Chebyshev);
     worley.biome_picker = SimpleBiomePicker::Any;
     worley.sharpness = 20.0;
@@ -71,7 +67,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     let mut img_data = Vec::new();
     for gx in 0..GRID_SIZE {
         for gz in 0..GRID_SIZE {
-            let weights = worley.get(WORLD_SEED, gx as f64, gz as f64);
+            let weights = worley.get(gx as f64, gz as f64);
 
             // blend colors
             let mut r = 0.0;
