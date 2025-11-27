@@ -372,7 +372,6 @@ where
             }
 
             if ui.add(egui::Button::new("load worley file")).clicked() {
-                info!("load");
                 let path = format!("assets/{}.worley.ron", &file_name);
                 let file = std::fs::read_to_string(&path);
                 match file {
