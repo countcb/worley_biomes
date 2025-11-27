@@ -327,7 +327,6 @@ where
     egui::Window::new("worley UI").show(egui_context.get_mut(), |ui| {
         egui::ScrollArea::both().show(ui, |ui| {
             // SERIALIZE FEATURES disabled
-            let mut worley_file_name = world.get_resource_or_init::<SaveWorleyFilename>();
             ui.add_enabled(false, egui::Button::new("save worley to file"));
             ui.colored_label(egui::Color32::RED, "saving requires feature=\"serde\"");
             ui.add_enabled(false, egui::Button::new("Load worley file"));

@@ -46,6 +46,7 @@ where
 }
 
 // euclidian squared
+#[cfg(feature = "serde")]
 fn default_distance_fn() -> fn(f64, f64) -> f64 {
     |dx, dz| dx * dx + dz * dz
 }
