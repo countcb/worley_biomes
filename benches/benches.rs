@@ -1,10 +1,9 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use std::hint::black_box;
 
-use serde::{Deserialize, Serialize};
 use worley_biomes::prelude::*;
 
-#[derive(Clone, Copy, Debug, Serialize, Deserialize, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 enum BiomeType {
     #[default]
     Desert,
