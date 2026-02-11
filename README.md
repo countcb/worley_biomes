@@ -19,6 +19,7 @@ I haven't done performance comparisons with other libraries, it does the job wel
 
 | bevy | worley biomes |
 | ---- | ------------------- |
+| 0.18 | 0.3.0               |
 | 0.17 | 0.2.0               |
 | 0.16 | 0.1.0               |
 
